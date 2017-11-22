@@ -12,9 +12,10 @@ import (
 )
 
 func init() {
+	//http.HandleFunc("/tst/a", handlerExactMatch) //see doc for ServerMux for how paths are matched
 
-	http.HandleFunc("/tst/", handler) //see doc for ServerMux for how paths are matched
-
+	http.HandleFunc("/tst/", handlerRootedSubTree) //see doc for ServerMux for how paths are matched
+	http.HandleFunc("/tst/a", handlerExactMatch)   //see doc for ServerMux for how paths are matched
 }
 
 type (
@@ -24,9 +25,10 @@ type (
 	}
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func handlerRootedSubTree(w http.ResponseWriter, r *http.Request) {
 	//watch: file loc
 	//fmt.Fprint(w, "Hello, world Windows!!!")
+	fmt.Fprint(w, "rooted subtree")
 
 	ctx := appengine.NewContext(r)
 	k := datastore.NewKey(ctx, "Entity", "", 0, nil)
@@ -41,4 +43,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	e2 := new(Entity)
 	datastore.Get(ctx, k2, e2)
 	fmt.Fprintf(w, "%#v", e2)
+
+}
+
+func handlerExactMatch(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "handler exact match")
+
+	//6015428115562496
+
+	ctx := appengine.NewContext(r)
+	k := datastore.NewKey(ctx, "Entity", "", 6015428115562496, nil)
+	e := new(Entity)
+	datastore.Get(ctx, k, e)
+	e.Value = "edit tst"
+	datastore.Put(ctx, k, e)
 }
