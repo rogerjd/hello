@@ -1,6 +1,7 @@
 package hello
 
 import (
+	"fmt"
 	"net/http"
 	//C:\Users\roger\AppData\Local\Google\Cloud SDK\google-cloud-sdk\platform\google_appengine\google\appengine\datastore
 	_ "golang.org/x/net/context" //as of 1.7 it is std lib, but gae may not be using latest(1.7)
@@ -17,6 +18,7 @@ func init() {
 }
 
 type (
+	//Entity a struct to r/w to/from datastore
 	Entity struct {
 		Value string
 	}
@@ -30,5 +32,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	k := datastore.NewKey(ctx, "Entity", "", 0, nil)
 	e := new(Entity)
 	e.Value = "gae test"
-	datastore.Put(ctx, k, e)
+	k2, err := datastore.Put(ctx, k, e)
+	if err != nil {
+		fmt.Fprint(w, "error occurred")
+	}
+	fmt.Fprint(w, "no error")
+
+	e2 := new(Entity)
+	datastore.Get(ctx, k2, e2)
+	fmt.Fprintf(w, "%#v", e2)
 }
