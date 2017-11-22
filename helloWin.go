@@ -13,7 +13,7 @@ import (
 
 func init() {
 
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/tst/", handler) //see doc for ServerMux for how paths are matched
 
 }
 
