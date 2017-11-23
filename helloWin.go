@@ -3,6 +3,7 @@ package hello
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	//C:\Users\roger\AppData\Local\Google\Cloud SDK\google-cloud-sdk\platform\google_appengine\google\appengine\datastore
 	_ "golang.org/x/net/context" //as of 1.7 it is std lib, but gae may not be using latest(1.7)
 
@@ -14,6 +15,7 @@ import (
 func init() {
 	//http.HandleFunc("/tst/a", handlerExactMatch) //see doc for ServerMux for how paths are matched
 
+	//  keep leading slash
 	http.HandleFunc("/tst/", handlerRootedSubTree) //see doc for ServerMux for how paths are matched
 	http.HandleFunc("/tst/a", handlerExactMatch)   //see doc for ServerMux for how paths are matched
 }
@@ -43,8 +45,9 @@ func handlerRootedSubTree(w http.ResponseWriter, r *http.Request) {
 	e2 := new(Entity)
 	datastore.Get(ctx, k2, e2)
 	fmt.Fprintf(w, "%#v", e2)
-
 }
+
+var cnt = 0
 
 func handlerExactMatch(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "handler exact match")
@@ -55,6 +58,7 @@ func handlerExactMatch(w http.ResponseWriter, r *http.Request) {
 	k := datastore.NewKey(ctx, "Entity", "", 6015428115562496, nil)
 	e := new(Entity)
 	datastore.Get(ctx, k, e)
-	e.Value = "edit tst"
+	cnt++
+	e.Value = "edit tst" + strconv.Itoa(cnt)
 	datastore.Put(ctx, k, e)
 }
